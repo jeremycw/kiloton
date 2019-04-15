@@ -1,9 +1,4 @@
-require "redis"
-require "json"
-require "./router"
 require "./procedure"
-require "../common/request_json"
-require "../common/response_json"
 
 class HttpProcedure < Procedure
   def initialize(@data : JSON::Any, @redis : Redis::PooledClient, @router : Router)

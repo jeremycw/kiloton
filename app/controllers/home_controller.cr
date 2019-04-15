@@ -1,10 +1,6 @@
-class HomeController
-  private getter request, params
-
-  def initialize(@request : HTTP::Request, @params : HTTP::Params)
-  end
-
+class HomeController < Kiloton::Controller
   def index
-    HTTP::Client::Response.new(200, "Hello, World!")
+    max_age = database.scalar "select count(*) from matchmakers"
+    HTTP::Client::Response.new(200, max_age.to_s)
   end
 end

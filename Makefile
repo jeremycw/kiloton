@@ -1,8 +1,13 @@
-kiloton: kiloton-worker frontend.cr frontend/*.cr common/*.cr shard.lock
+kiloton: bake/kiloton-worker frontend.cr frontend/*.cr common/*.cr shard.lock
 	crystal build frontend.cr -o $@
 
-kiloton-worker: backend.cr backend/*.cr common/*.cr app/controllers/*.cr app/*.cr shard.lock
+bake/kiloton-worker: backend.cr backend/*.cr common/*.cr app/controllers/*.cr app/*.cr shard.lock | bake
 	crystal build backend.cr -o $@
 
+bake:
+	@mkdir $@
+
 clean:
-	rm kiloton kiloton-worker
+	@rm -rf kiloton *.dwarf bake
+
+.PHONY: clean

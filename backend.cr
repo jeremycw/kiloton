@@ -1,6 +1,7 @@
 require "redis"
 require "json"
 require "http/server"
+require "mysql"
 require "./backend/*"
 require "./common/*"
 require "./app/**"
@@ -12,3 +13,4 @@ router = Routes.new
 worker.register("http", Proc(JSON::Any, Procedure).new { |data| HttpProcedure.new(data, redis, router) })
 worker.handle_orphans
 worker.listen
+Kiloton::Controller.database.close
