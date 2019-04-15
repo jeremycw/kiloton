@@ -1,5 +1,3 @@
-require "http/server"
-
 class Route
   class Error < Exception
     def initialize(pattern, message)
@@ -21,7 +19,7 @@ class Route
     @@prefix
   end
 
-  def initialize(@method : String, pattern, @action : (HTTP::Request, HTTP::Params) -> Nil)
+  def initialize(@method : String, pattern, @action : (HTTP::Request, HTTP::Params) -> HTTP::Client::Response)
     original_pattern = "#{@@prefix}#{pattern}"
     pattern = original_pattern.gsub(/\/$/, "")
 

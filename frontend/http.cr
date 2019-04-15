@@ -2,6 +2,7 @@ require "http/server"
 require "redis"
 require "uuid"
 require "json"
+require "../common/response_json"
 
 class HttpFrontend
   def initialize(@port : Int32, @url : String)
@@ -45,7 +46,12 @@ class HttpFrontend
       response = @redis.blpop [response_key], 20
       @redis.del response_key
       if !response.nil? && response.size > 1
-        context.response.print response[1]
+        json = response[1]
+        if json.is_a?(String)
+          ResponseJson.from_json(json).output(context.response)
+        else
+          #500 error
+        end
       else
         #502
       end
@@ -54,6 +60,3 @@ class HttpFrontend
     server.listen
   end
 end
-
-http = HttpFrontend.new(8080, "redis://127.0.0.1:6379/0")
-http.listen

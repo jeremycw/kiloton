@@ -1,5 +1,3 @@
-require "./route"
-
 abstract class Router
   abstract def call(request)
 
@@ -36,7 +34,7 @@ abstract class Router
           \{% controller = action.split("#")[0] %}
           \{% action = action.split("#")[1] %}
           \{% raise(action_error) unless controller && action %}
-          \{% action = "-> (request : HTTP::Request, params : HTTP::Params) { controller = #{controller.id}.new(request, params); controller.#{action.id}; nil }" %}
+          \{% action = "Proc(HTTP::Request, HTTP::Params, HTTP::Client::Response).new { |request, params| controller = #{controller.id}.new(request, params); controller.#{action.id} }" %}
         \{% elsif !action.is_a?(ProcLiteral) %}
            \{% raise(action_error) %}
         \{% end %}
@@ -46,7 +44,7 @@ abstract class Router
       end
 
       macro {{method.downcase.id}}(pattern)
-        \{% action = "-> (request : HTTP::Request, params : HTTP::Params) { #{yield}; nil }" %}
+      \{% action = "Proc(HTTP::Request, HTTP::Params, HTTP::Client::Response).new { |request, params| #{yield} }" %}
         {{method.downcase.id}}(\{{pattern}}, \{{action.id}})
       end
     {% end %}

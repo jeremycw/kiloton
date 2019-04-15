@@ -5,6 +5,6 @@ class HomeController
   end
 
   def index
-    puts "Hello, World!"
+    HTTP::Client::Response.new(200, "Hello, World!")
   end
 end
