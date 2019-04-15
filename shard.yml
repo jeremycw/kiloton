@@ -5,5 +5,8 @@ dependencies:
   redis:
     github: stefanwille/crystal-redis
     version: ~> 2.1.1
+  mysql:
+    github: crystal-lang/crystal-mysql
+    version: ~> 0.5.1
 
 license: MIT
