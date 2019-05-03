@@ -11,44 +11,38 @@ class HttpFrontend
 
   def listen
     server = HTTP::Server.new do |context|
-      body = context.request.body
-      rpc_id = UUID.random.hexstring
-      response_key = "kiloton:rpc:response:#{rpc_id}"
-      rpc = JSON.build do |json|
-        json.object do
-          json.field "procedure", "http"
-          json.field "response", response_key
-          json.field "args" do
-            json.array do
-              json.object do
-                if !body.nil?
-                  json.field "body", body.gets_to_end
-                end
-                json.field "headers" do
-                  json.object do
-                    context.request.headers.each do |k,v|
-                      json.field k, v[0]
-                    end
-                  end
-                end
-                json.field "method", context.request.method
-                json.field "resource", context.request.resource
-              end
-            end
-          end
-        end
+      body = nil
+      io = context.request.body 
+      if !io.nil?
+        body = io.gets_to_end
       end
+      rpc_id = UUID.random.hexstring
+      headers = Array(Tuple(String, String)).new
+      context.request.headers.each do |k,v|
+        headers << { k, v[0] }
+      end
+      request = Request.new(headers, body, context.request.resource, context.request.method)
+      response_key = "kiloton:rpc:response:#{rpc_id}"
+      job = Job.new("http", response_key, "Request")
       key = "kiloton:rpc:request:#{rpc_id}"
+      arg_key = "kiloton:rpc:arg:#{rpc_id}"
       @redis.pipelined do |pipe|
-        pipe.set(key, rpc)
+        io = IO::Memory.new
+        Cannon.encode(io, job)
+        pipe.set(key, io.to_s)
+        io = IO::Memory.new
+        Cannon.encode(io, request)
+        pipe.set(arg_key, io.to_s)
         pipe.publish("kiloton:worker", key)
       end
       response = @redis.blpop [response_key], 20
       @redis.del response_key
       if !response.nil? && response.size > 1
-        json = response[1]
-        if json.is_a?(String)
-          ResponseJson.from_json(json).output(context.response)
+        obj = response[1]
+        if obj.is_a?(String)
+          io = IO::Memory.new(obj)
+          res = Cannon.decode(io, Response)
+          res.output(context.response)
         else
           #500 error
         end

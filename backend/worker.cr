@@ -1,7 +1,7 @@
 class Worker
   def initialize(@url : String)
     @redis = Redis::PooledClient.new(url: @url)
-    @procedures = {} of String => Proc(JSON::Any, Procedure)
+    @procedures = {} of String => Proc(String, String, Procedure)
   end
 
   def register(name, procedure)
@@ -25,14 +25,22 @@ class Worker
 
   def handle(key)
     future = Redis::Future.new
+    arg_future = Redis::Future.new
+    return unless key.is_a?(String)
+    tmp = key.split(":")
+    id = tmp.pop
+    arg_key = "kiloton:rpc:arg:#{id}"
     @redis.multi do |client|
       future = client.get(key)
+      arg_future = client.get(arg_key)
       client.del(key)
+      client.del(arg_key)
     end
     str = future.value
+    arg = arg_future.value
     if str.is_a?(String)
-      json = JSON.parse(str)
-      @procedures[json["procedure"]].call(json).perform(json["args"])
+      job = Cannon.decode(IO::Memory.new(str), Job)
+      @procedures[job.procedure].call(arg.is_a?(String) ? arg : "", job.response_key).perform
     end
   end
 end

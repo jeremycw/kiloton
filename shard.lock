@@ -4,6 +4,10 @@ shards:
     github: schovi/baked_file_system
     version: 0.9.8
 
+  cannon:
+    github: Papierkorb/cannon
+    version: 0.2.1
+
   db:
     github: crystal-lang/crystal-db
     version: 0.5.1
@@ -23,4 +27,8 @@ shards:
   redis:
     github: stefanwille/crystal-redis
     version: 2.1.1
+
+  schedule:
+    github: hugoabonizio/schedule.cr
+    version: 0.2.1
 

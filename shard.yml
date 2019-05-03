@@ -17,5 +17,9 @@ dependencies:
   schedule:
     github: hugoabonizio/schedule.cr
     version: ~> 0.2.1
+  cannon:
+    github: Papierkorb/cannon
+    version: ~> 0.2.1
+
 
 license: MIT

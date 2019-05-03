@@ -1,13 +1,15 @@
-require "json"
 require "http/server"
 
-class RequestJson
-  JSON.mapping({
-    headers: Hash(String, String),
-    body: { type: String, nilable: true },
-    resource: String,
-    method: String
-  })
+class Request
+  include Cannon::Auto
+
+  property headers : Array(Tuple(String, String))
+  property body : String?
+  property resource : String
+  property method : String
+
+  def initialize(@headers, @body, @resource, @method)
+  end
 
   def to_request
     http_headers = HTTP::Headers.new

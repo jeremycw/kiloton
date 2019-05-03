@@ -1,4 +1,4 @@
 abstract class Procedure
-  abstract def perform(args)
+  abstract def perform
 end
 

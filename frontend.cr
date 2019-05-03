@@ -1,7 +1,8 @@
 require "http/server"
 require "redis"
 require "uuid"
-require "json"
+require "cannon"
+require "io/memory"
 require "./frontend/*"
 require "./common/*"
 

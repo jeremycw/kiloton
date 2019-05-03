@@ -4,7 +4,7 @@ module Kiloton
   class Controller
     protected getter request, params
 
-    @@database : DB::Database = DB.open "mysql://root@127.0.0.1:3306/pool_development"
+    @@database : DB::Database = DB.open "mysql://root:my-secret-root-password@127.0.0.1:10100/johnny5_development"
 
     def self.database
       @@database

@@ -1,19 +1,24 @@
 require "./procedure"
 
 class HttpProcedure < Procedure
-  def initialize(@data : JSON::Any, @redis : Redis::PooledClient, @router : Router)
+  @request : Request
+
+  def initialize(@data : String, @response_key : String, @redis : Redis::PooledClient, @router : Kiloton::Router)
+    io = IO::Memory.new(@data)
+    @request = Cannon.decode(io, Request)
   end
 
   def respond(response)
-    str = ResponseJson.new(response).to_json
+    io = IO::Memory.new
+    Cannon.encode(io, Response.new(response))
     @redis.pipelined do |pipe|
-      pipe.lpush(@data["response"], str)
-      pipe.expire(@data["response"], 30)
+      pipe.lpush(@response_key, io.to_s)
+      pipe.expire(@response_key, 30)
     end
   end
 
-  def perform(args)
-    request = RequestJson.from_json(args[0].to_json).to_request
+  def perform
+    request = @request.to_request
     response = @router.call(request)
     if !response.nil?
       respond(response)
