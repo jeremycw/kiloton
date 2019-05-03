@@ -1,4 +1,4 @@
-class Route
+class Kiloton::Route
   class Error < Exception
     def initialize(pattern, message)
       super("failed to parse route pattern `#{pattern}' - #{message}")

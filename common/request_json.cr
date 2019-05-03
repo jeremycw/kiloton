@@ -1,6 +1,6 @@
 require "http/server"
 
-class Request
+class Kiloton::Request
   include Cannon::Auto
 
   property headers : Array(Tuple(String, String))

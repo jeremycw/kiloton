@@ -1,4 +1,4 @@
-class Response
+class Kiloton::Response
   include Cannon::Auto
 
   property status_code : Int32

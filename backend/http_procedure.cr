@@ -1,6 +1,6 @@
 require "./procedure"
 
-class HttpProcedure < Procedure
+class Kiloton::HttpProcedure < Kiloton::Procedure
   @request : Request
 
   def initialize(@data : String, @response_key : String, @redis : Redis::PooledClient, @router : Kiloton::Router)

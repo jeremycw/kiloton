@@ -1,4 +1,4 @@
-class Worker
+class Kiloton::Worker
   def initialize(@url : String)
     @redis = Redis::PooledClient.new(url: @url)
     @procedures = {} of String => Proc(String, String, Procedure)

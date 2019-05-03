@@ -7,7 +7,7 @@ require "./frontend/*"
 require "./common/*"
 
 tmp = File.tempfile("worker")
-IO.copy(Vfs.get("kiloton-worker"), tmp)
+IO.copy(Kiloton::Vfs.get("kiloton-worker"), tmp)
 File.chmod(tmp.path, 0o777)
 tmp.close
 
@@ -18,5 +18,5 @@ workers.times do
   end
 end
 
-http = HttpFrontend.new(8080, "redis://127.0.0.1:6379/0")
+http = Kiloton::HttpFrontend.new(8080, "redis://127.0.0.1:6379/0")
 http.listen

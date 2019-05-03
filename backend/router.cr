@@ -4,7 +4,7 @@ module Kiloton
 
     macro inherited
       {% methods = %i(GET POST PUT PATCH DELETE) %}
-      ROUTES = {} of String => Array(Route)
+      ROUTES = {} of String => Array(Kiloton::Route)
 
       def self.routes
         ROUTES
@@ -25,7 +25,7 @@ module Kiloton
       end
 
       macro group(prefix)
-        Route.prefixed(\{{prefix}}) { \{{yield}} }
+        Kiloton::Route.prefixed(\{{prefix}}) { \{{yield}} }
       end
 
       {% for method in methods %}
@@ -39,9 +39,9 @@ module Kiloton
           \{% elsif !action.is_a?(ProcLiteral) %}
              \{% raise(action_error) %}
           \{% end %}
-          \{% static_part = %["\#{Route.prefix}#{pattern.id}".gsub(/(\\:|\\(|\\/$).*/, "")] %}
-          ROUTES[\{{static_part.id}}] ||= [] of Route
-          ROUTES[\{{static_part.id}}] << Route.new({{method.id.stringify}}, \{{pattern}}, \{{action.id}})
+          \{% static_part = %["\#{Kiloton::Route.prefix}#{pattern.id}".gsub(/(\\:|\\(|\\/$).*/, "")] %}
+          ROUTES[\{{static_part.id}}] ||= [] of Kiloton::Route
+          ROUTES[\{{static_part.id}}] << Kiloton::Route.new({{method.id.stringify}}, \{{pattern}}, \{{action.id}})
         end
 
         macro {{method.downcase.id}}(pattern)

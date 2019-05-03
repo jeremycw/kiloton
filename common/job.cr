@@ -1,4 +1,4 @@
-class Job
+class Kiloton::Job
   include Cannon::Auto
 
   property procedure : String

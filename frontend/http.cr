@@ -4,7 +4,7 @@ require "uuid"
 require "json"
 require "../common/response_json"
 
-class HttpFrontend
+class Kiloton::HttpFrontend
   def initialize(@port : Int32, @url : String)
     @redis = Redis::PooledClient.new(url: @url)
   end

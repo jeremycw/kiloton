@@ -1,6 +1,6 @@
 require "baked_file_system"
 
-class Vfs
+class Kiloton::Vfs
   extend BakedFileSystem
 
   bake_folder "../bake"
