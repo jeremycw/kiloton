@@ -3,6 +3,7 @@ require "redis"
 require "uuid"
 require "cannon"
 require "io/memory"
+require "schedule"
 require "./frontend/*"
 require "./common/*"
 
@@ -18,5 +19,7 @@ workers.times do
   end
 end
 
-http = Kiloton::HttpFrontend.new(8080, "redis://127.0.0.1:6379/0")
+redis = Redis::PooledClient.new(url: "redis://127.0.0.1:6379/0")
+rpc = Kiloton::RpcService.new(redis)
+http = Kiloton::HttpFrontend.new(rpc, 8080)
 http.listen

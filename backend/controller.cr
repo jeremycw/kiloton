@@ -4,21 +4,15 @@ module Kiloton
   class Controller
     protected getter request, params
 
-    @@database : DB::Database = DB.open "mysql://root:my-secret-root-password@127.0.0.1:10100/johnny5_development"
-
-    def self.database
-      @@database
-    end
-
     def initialize(@request : HTTP::Request, @params : HTTP::Params)
     end
 
     def query
-      ConcreteBuilder.new(@@database)
+      ConcreteBuilder.new(Database.connection)
     end
 
     def database
-      @@database
+      Database.connection
     end
 
     class ConcreteBuilder < Query::Builder
