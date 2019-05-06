@@ -18,7 +18,7 @@ class Kiloton::Worker
     redis = Redis.new(url: @url)
     redis.subscribe("kiloton:worker") do |on|
       on.message do |channel, message|
-        handle(message)
+        spawn { handle(message) }
       end
     end
   end
