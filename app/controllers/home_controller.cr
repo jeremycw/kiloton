@@ -4,6 +4,7 @@ class HomeController < Kiloton::Controller
     query.table("customers").get_all do |rs|
       puts rs.column_name(0)
     end
+    TestJob.new("Wtf?!").perform_later
     HTTP::Client::Response.new(200, max_age.to_s)
   end
 end

@@ -3,7 +3,7 @@ require "./procedure"
 class Kiloton::HttpProcedure < Kiloton::Procedure
   @request : Request
 
-  def initialize(@data : String, @response_key : String, @redis : Redis::PooledClient, @router : Kiloton::Router)
+  def initialize(@data : String, @rpc : Rpc, @redis : Redis::PooledClient, @router : Kiloton::Router)
     io = IO::Memory.new(@data)
     @request = Cannon.decode(io, Request)
   end
@@ -12,8 +12,8 @@ class Kiloton::HttpProcedure < Kiloton::Procedure
     io = IO::Memory.new
     Cannon.encode(io, Response.new(response))
     @redis.pipelined do |pipe|
-      pipe.lpush(@response_key, io.to_s)
-      pipe.expire(@response_key, 30)
+      pipe.lpush(@rpc.response_key, io.to_s)
+      pipe.expire(@rpc.response_key, 30)
     end
   end
 

@@ -17,12 +17,12 @@ class Kiloton::HttpCaller
     end
     request = Request.new(headers, body, request.resource, request.method)
     response_key = "kiloton:rpc:response:#{rpc_id}"
-    job = Job.new("http", response_key, "Request")
+    rpc = Rpc.new("http", response_key, "Request")
     key = "kiloton:rpc:request:#{rpc_id}"
     arg_key = "kiloton:rpc:arg:#{rpc_id}"
     @redis.pipelined do |pipe|
       io = IO::Memory.new
-      Cannon.encode(io, job)
+      Cannon.encode(io, rpc)
       pipe.set(key, io.to_s)
       io = IO::Memory.new
       Cannon.encode(io, request)

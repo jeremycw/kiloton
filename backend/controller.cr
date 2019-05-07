@@ -1,5 +1,3 @@
-require "query-builder"
-
 module Kiloton
   class Controller
     protected getter request, params

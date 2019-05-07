@@ -1,7 +1,7 @@
 class Kiloton::Worker
   def initialize(@url : String)
     @redis = Redis::PooledClient.new(url: @url)
-    @procedures = {} of String => Proc(String, String, Procedure)
+    @procedures = {} of String => Proc(String, Rpc, Procedure)
   end
 
   def register(name, procedure)
@@ -39,8 +39,8 @@ class Kiloton::Worker
     str = future.value
     arg = arg_future.value
     if str.is_a?(String)
-      job = Cannon.decode(IO::Memory.new(str), Job)
-      @procedures[job.procedure].call(arg.is_a?(String) ? arg : "", job.response_key).perform
+      rpc = Cannon.decode(IO::Memory.new(str), Rpc)
+      @procedures[rpc.procedure].call(arg.is_a?(String) ? arg : "", rpc).perform
     end
   end
 end
