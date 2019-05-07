@@ -46,6 +46,7 @@ workers.times do
 end
 
 redis = Redis::PooledClient.new(url: "redis://127.0.0.1:6379/0")
+Kiloton::Job.redis = redis
 rpc = Kiloton::RpcService.new(redis)
 http = Kiloton::HttpFrontend.new(rpc, 8080)
 schedule = Cron.new
