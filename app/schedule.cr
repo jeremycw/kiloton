@@ -1,3 +1,5 @@
 class Cron < Kiloton::Schedule
-  every 1.day, "CleanupJob"
+  schedule do
+    every 1.second, ScheduledJob
+  end
 end
