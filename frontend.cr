@@ -2,12 +2,23 @@ require "http/server"
 require "redis"
 require "uuid"
 require "cannon"
-require "io/memory"
 require "schedule"
 require "./common/**"
 require "./frontend/**"
 require "./app/schedule"
 require "./app/jobs/**"
+
+module Kiloton
+  @@master : Bool = false
+
+  def self.master=(master)
+    @@master = master
+  end
+
+  def self.master
+    @@master
+  end
+end
 
 {% for klass in Kiloton::Job.all_subclasses %}
   class {{ klass }} < Kiloton::Job
@@ -45,7 +56,27 @@ workers.times do
   end
 end
 
+lua = <<-LUA
+if redis.call('exists', KEYS[1]) == 0 then
+  redis.call('set', KEYS[1], 1)
+  redis.call('expire', KEYS[1], 6)
+  return {1, KEYS[1], 'OK'}
+else
+  return {0, KEYS[1], 'OK'}
+end
+LUA
+
 redis = Redis::PooledClient.new(url: "redis://127.0.0.1:6379/0")
+spawn do
+  loop do
+    redis.multi do |client|
+      client.del("kiloton:master") if Kiloton.master
+      master = redis.eval(lua, ["kiloton:master"])
+      Kiloton.master = master[0] == 1
+    end
+    sleep 5.seconds
+  end
+end
 Kiloton::Job.redis = redis
 rpc = Kiloton::RpcService.new(redis)
 http = Kiloton::HttpFrontend.new(rpc, 8080)

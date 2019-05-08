@@ -10,7 +10,7 @@ module Kiloton
       {% job = args.last %}
       {% new_args = args.reject { |a| a.id == job.id } %}
       ::Schedule.every({{*new_args}}) do
-        {{ job }}.new.perform_later
+        {{ job }}.new.perform_later if Kiloton.master
       end
     end
   end
