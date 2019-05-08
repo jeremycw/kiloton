@@ -1,10 +1,15 @@
 class HomeController < Kiloton::Controller
   def index
-    max_age = database.scalar "select count(*) from customers"
-    query.table("customers").get_all do |rs|
-      puts rs.column_name(0)
+    res = "{ \"customers\":["
+    query.table("customers").select("id, email").is_not_null("email").limit(100).get_all do |rs|
+      sep = ""
+      rs.each do
+        res += "#{sep}{ \"id\": #{rs.read(Int32)}, \"email\": \"#{rs.read(String?)}\" }"
+        sep = ","
+      end
+      res += "]}"
     end
     TestJob.new("Wtf?!").perform_later
-    HTTP::Client::Response.new(200, max_age.to_s)
+    HTTP::Client::Response.new(200, res)
   end
 end

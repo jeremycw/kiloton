@@ -18,8 +18,14 @@ module Kiloton
         super()
       end
 
+      def is_not_null(field : String, and_or = "AND")
+        @where += @where.empty? ? "#{field} IS NOT NULL" : " #{and_or} #{field} IS NOT NULL"
+        self
+      end
+
       def get_all
         query = super
+        puts query
         @database.query(query) do |rs|
           yield(rs)
         end
