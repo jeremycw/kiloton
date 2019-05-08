@@ -10,4 +10,7 @@ bake:
 clean:
 	@rm -rf kiloton *.dwarf bake
 
-.PHONY: clean
+run: kiloton
+	./kiloton
+
+.PHONY: clean run
