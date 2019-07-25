@@ -69,11 +69,13 @@ LUA
 redis = Redis::PooledClient.new(url: "redis://127.0.0.1:6379/0")
 spawn do
   loop do
+    future = Redis::Future.new
     redis.multi do |client|
       client.del("kiloton:master") if Kiloton.master
-      master = redis.eval(lua, ["kiloton:master"])
-      Kiloton.master = master[0] == 1
+      future = client.eval(lua, ["kiloton:master"])
     end
+    master = future.value
+    Kiloton.master = master[0] == 1 if master.is_a?(Array(Redis::RedisValue))
     sleep 5.seconds
   end
 end
