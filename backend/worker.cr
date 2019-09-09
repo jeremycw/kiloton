@@ -23,13 +23,13 @@ class Kiloton::Worker
     end
   end
 
-  def handle(key)
+  def handle(raw_uuid)
     future = Redis::Future.new
     arg_future = Redis::Future.new
-    return unless key.is_a?(String)
-    tmp = key.split(":")
-    id = tmp.pop
-    arg_key = "kiloton:rpc:arg:#{id}"
+    return unless raw_uuid.is_a?(String)
+    uuid = UUID.new(raw_uuid.to_unsafe.to_slice(16)).hexstring
+    key = "kiloton:rpc:request:#{uuid}"
+    arg_key = "kiloton:rpc:arg:#{uuid}"
     @redis.multi do |client|
       future = client.get(key)
       arg_future = client.get(arg_key)

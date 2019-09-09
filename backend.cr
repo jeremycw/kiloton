@@ -18,10 +18,11 @@ require "./app/controllers/**"
     def perform_later
       io = IO::Memory.new
       Cannon.encode io, self
-      rpc_id = UUID.random.hexstring
+      rpc_id = UUID.random
+      rpc_hex = rpc_id.hexstring
       rpc = Kiloton::Rpc.new("job", "", "{{ klass }}")
-      key = "kiloton:rpc:request:#{rpc_id}"
-      arg_key = "kiloton:rpc:arg:#{rpc_id}"
+      key = "kiloton:rpc:request:#{rpc_hex}"
+      arg_key = "kiloton:rpc:arg:#{rpc_hex}"
       Kiloton::Job.redis.pipelined do |pipe|
         io = IO::Memory.new
         Cannon.encode(io, rpc)
@@ -29,7 +30,7 @@ require "./app/controllers/**"
         io = IO::Memory.new
         Cannon.encode(io, self)
         pipe.set(arg_key, io.to_s)
-        pipe.publish("kiloton:worker", key)
+        pipe.publish("kiloton:worker", String.new(rpc_id.to_unsafe.to_slice(16)))
       end
     end
   end

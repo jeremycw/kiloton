@@ -12,4 +12,8 @@ class HomeController < Kiloton::Controller
     TestJob.new("Wtf?!").perform_later
     HTTP::Client::Response.new(200, res)
   end
+
+  def hello_world
+    HTTP::Client::Response.new(200, "Hello, #{params["name"]}!")
+  end
 end
