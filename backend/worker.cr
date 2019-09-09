@@ -9,7 +9,7 @@ class Kiloton::Worker
   end
 
   def handle_orphans
-    @redis.keys("kiloton:rpc:request:*").each do |key|
+    @redis.keys("kilo:req:*").each do |key|
       handle(key)
     end
   end
@@ -28,8 +28,8 @@ class Kiloton::Worker
     arg_future = Redis::Future.new
     return unless raw_uuid.is_a?(String)
     uuid = UUID.new(raw_uuid.to_unsafe.to_slice(16)).hexstring
-    key = "kiloton:rpc:request:#{uuid}"
-    arg_key = "kiloton:rpc:arg:#{uuid}"
+    key = "kilo:req:#{raw_uuid}"
+    arg_key = "kilo:arg:#{raw_uuid}"
     @redis.multi do |client|
       future = client.get(key)
       arg_future = client.get(arg_key)
